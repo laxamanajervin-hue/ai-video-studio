@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>AI Video Studio</title>
+<style>
+:root{--bg:#0b1020;--panel:#141c30;--panel2:#1b2740;--text:#f5f7ff;--muted:#9ba8c4;--accent:#8b5cf6;--accent2:#22d3ee;--line:#2b3854;--good:#34d399}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#252052 0,#0b1020 45%);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:1100px;margin:auto;padding:22px}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:24px}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:22px}.brand h1{font-size:20px;margin:0}.brand small{color:var(--muted)}
+.pill{border:1px solid var(--line);background:#18233a;padding:9px 13px;border-radius:999px;color:#dce5ff}
+.grid{display:grid;grid-template-columns:1.35fr .85fr;gap:18px}.card{background:linear-gradient(160deg,rgba(26,38,63,.96),rgba(17,25,43,.96));border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 50px #0003}.card h2{margin:0 0 5px;font-size:19px}.sub{color:var(--muted);margin:0 0 18px;font-size:13px}
+.tabs{display:flex;gap:8px;margin:16px 0}.tab,button{border:0;border-radius:12px;padding:11px 15px;font-weight:650;cursor:pointer}.tab{background:#202c45;color:#c7d2eb}.tab.active,button.primary{background:linear-gradient(110deg,var(--accent),#6366f1);color:white}
+label{display:block;color:#c9d4eb;font-size:13px;margin:14px 0 7px}textarea,input,select{width:100%;background:#0d1527;border:1px solid var(--line);border-radius:12px;color:var(--text);padding:12px;font:inherit;outline:none}textarea{min-height:105px;resize:vertical}input[type=file]{padding:10px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hint{font-size:12px;color:var(--muted);margin-top:6px}.actions{display:flex;gap:10px;align-items:center;margin-top:18px;flex-wrap:wrap}button.secondary{background:#25334f;color:#e8edff}button:disabled{opacity:.45;cursor:not-allowed}
+.preview{aspect-ratio:16/9;border:1px dashed #52617e;border-radius:16px;background:linear-gradient(135deg,#111a2d,#20264b);display:grid;place-items:center;text-align:center;padding:18px;color:var(--muted);overflow:hidden}.preview img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px}.preview video{width:100%;height:100%;object-fit:contain}
+.stat{display:flex;justify-content:space-between;align-items:center;margin:12px 0}.big{font-size:32px;font-weight:800;letter-spacing:-1px}.bar{height:9px;border-radius:99px;background:#0b1324;overflow:hidden}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:100%}
+.plan{padding:14px;border:1px solid var(--line);border-radius:14px;margin-top:10px;background:#101a2d}.plan strong{display:block}.plan small{color:var(--muted)}.plan button{float:right;padding:8px 11px;font-size:12px}
+.notice{margin-top:16px;padding:12px;border-radius:12px;background:#102c2a;border:1px solid #1c5a50;color:#baf5e4;font-size:13px}
+.status{margin-top:14px;color:var(--muted);font-size:13px;min-height:22px}.foot{color:var(--muted);font-size:12px;margin:20px 4px}
+@media(max-width:780px){.grid{grid-template-columns:1fr}.wrap{padding:14px}.card{padding:16px}.row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header class="top">
+  <div class="brand"><div class="logo">▶</div><div><h1>AI Video Studio</h1><small>Create videos from a photo or a prompt</small></div></div>
+  <div class="pill">✨ <b id="topCredits">10</b> daily credits · <span id="planLabel">Free</span></div>
+ </header>
+ <main class="grid">
+  <section class="card">
+   <h2>Create a video</h2><p class="sub">Choose a creation mode, add your content, then generate a preview request.</p>
+   <div class="tabs"><button class="tab active" id="imageTab" type="button">Image to video</button><button class="tab" id="textTab" type="button">Text to video</button></div>
+   <div id="imagePanel">
+    <label for="photo">Upload an image</label><input id="photo" type="file" accept="image/*">
+    <div class="hint">Use an image you own or have permission to use.</div>
+   </div>
+   <label for="prompt">Describe the video</label>
+   <textarea id="prompt" placeholder="Example: The model gently turns toward the camera, smiles naturally, and shows the outfit. Smooth camera movement, realistic lighting."></textarea>
+   <div class="row">
+    <div><label for="duration">Duration</label><select id="duration"><option value="5">5 seconds · 5 credits</option><option value="10" selected>10 seconds · 10 credits</option><option value="14">14 seconds · 14 credits</option><option value="15">15 seconds · 15 credits</option><option value="30">30 seconds · 30 credits</option></select></div>
+    <div><label for="quality">Quality</label><select id="quality"><option>Standard</option><option>High (planned)</option></select></div>
+   </div>
+   <div class="actions"><button class="primary" id="generate">Generate video</button><button class="secondary" id="clear">Clear</button><span class="hint" id="cost">Cost: 10 credits</span></div>
+   <div class="status" id="status" aria-live="polite">Ready when you are.</div>
+   <div class="notice">Demo mode: this prototype does not call an AI video service yet. Connect a video-generation API to create real downloadable videos.</div>
+  </section>
+  <aside class="card">
+   <h2>Your studio</h2><p class="sub">Daily credits refresh at midnight Philippine time.</p>
+   <div class="stat"><span>Available credits</span><span class="big" id="credits">10</span></div>
+   <div class="bar"><span id="creditBar"></span></div>
+   <div class="stat"><span class="hint">Daily allowance</span><b id="allowance">10 / 10</b></div>
+   <div class="plan"><button class="secondary" type="button" onclick="showPlan('Pro')">View</button><strong>Pro · ₱199/month</strong><small>100 daily credits · priority queue (planned)</small></div>
+   <div class="plan"><button class="secondary" type="button" onclick="showPlan('Premium')">View</button><strong>Premium · ₱499/month</strong><small>300 daily credits · premium features (planned)</small></div>
+   <div class="notice" id="planInfo">Free plan: 10 daily credits. Unused daily credits do not roll over.</div>
+   <label>Video preview</label>
+   <div class="preview" id="preview"><div><div style="font-size:34px">▧</div><b>Your video preview appears here</b><div class="hint">Real generation will be available after API setup.</div></div></div>
+   <div class="foot">Credits are deducted only in this local demo. Failed real generations should be refunded by the server after API integration.</div>
+  </aside>
+ </main>
+ <p class="foot">AI Video Studio prototype · Responsive web app concept for mobile and desktop.</p>
+</div>
+<script>
+const allowanceByPlan={Free:10,Pro:100,Premium:300};
+let plan='Free',credits=10,mode='image',photoUrl='';
+const $=id=>document.getElementById(id);
+function update(){ $('credits').textContent=credits;$('topCredits').textContent=credits;$('planLabel').textContent=plan;$('allowance').textContent=credits+' / '+allowanceByPlan[plan];$('creditBar').style.width=(credits/allowanceByPlan[plan]*100)+'%';$('cost').textContent='Cost: '+$('duration').value+' credits'; }
+function showPlan(p){$('planInfo').textContent=p+' selected. Subscription checkout is not connected in this prototype; payment setup and server-side credit management are required before launch.';}
+$('imageTab').onclick=()=>{mode='image';$('imageTab').classList.add('active');$('textTab').classList.remove('active');$('imagePanel').style.display='block';};
+$('textTab').onclick=()=>{mode='text';$('textTab').classList.add('active');$('imageTab').classList.remove('active');$('imagePanel').style.display='none';};
+$('duration').onchange=update;
+$('photo').onchange=e=>{const f=e.target.files[0];if(!f)return;if(photoUrl)URL.revokeObjectURL(photoUrl);photoUrl=URL.createObjectURL(f);$('preview').innerHTML='';const img=document.createElement('img');img.src=photoUrl;$('preview').appendChild(img);};
+$('clear').onclick=()=>{$('prompt').value='';$('photo').value='';$('status').textContent='Cleared.';$('preview').innerHTML='<div><div style="font-size:34px">▧</div><b>Your video preview appears here</b><div class="hint">Real generation will be available after API setup.</div></div>';if(photoUrl){URL.revokeObjectURL(photoUrl);photoUrl='';}};
+$('generate').onclick=()=>{const cost=Number($('duration').value);if(!$('prompt').value.trim()){ $('status').textContent='Please enter a video prompt first.';return;}if(mode==='image'&&!$('photo').files.length){$('status').textContent='Please upload an image for image-to-video.';return;}if(credits<cost){$('status').textContent='Not enough credits. Choose a shorter video or upgrade your plan.';return;}credits-=cost;update();$('status').textContent='Demo request created. No real video was generated because an AI video API is not connected.';};
+function resetAtMidnight(){const now=new Date(),next=new Date(now);next.setHours(24,0,0,0);setTimeout(()=>{credits=allowanceByPlan[plan];update();resetAtMidnight();},next-now);}
+update();resetAtMidnight();
+</script>
+</body>
+</html>
